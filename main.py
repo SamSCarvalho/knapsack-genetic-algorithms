@@ -30,20 +30,44 @@ def fitness(individuo, itens):
 			totalPeso += itens[index].peso
 		index += 1
 
-	# return totalPeso <= CAPACIDADE_MOCHILA
 	if totalPeso > CAPACIDADE_MOCHILA:
 		return False # INDIVIDUO COM PESO MAIOR QUE CAPACIDADE :(
 	else:
 		return individuo # ESTA OKAY
 	
+def pegarValorIndividuo(individuo, itens):
+	index = 0
+	totalValor = 0
+	for i in individuo:
+		if index >= len(itens):
+			break
+		if (i == 1):
+			totalValor += itens[index].valor
+		index += 1
+	return totalValor
+
+def pegarPesoIndividuo(individuo, itens):
+	index = 0
+	totalPeso = 0
+	for i in individuo:
+		if index >= len(itens):
+			break
+		if (i == 1):
+			totalPeso += itens[index].peso
+		index += 1
+	return totalPeso
+
 def main():
+	geracao = 0
 	itens = gerarItens() # gerar itens de acordo com o CSV
 	populacao = gerarPopulacaoInicial(itens) # gerar a populacao inicial
 	print(populacao)
 	for g in range(0, GEN_MAXIMO):
-		populacao = filter(lambda x: fitness(x, itens), populacao)
-		print(" -- Populacao selecionada -- ")
-		print(populacao)
+		geracao += 1
+		print(" --- Geracao %s ---" % str(geracao))
+		populacao = filter(lambda x: fitness(x, itens), populacao) # selecionar populacao
+		for ind in populacao:
+			print("%s, Valor: [ %s ] Peso: [ %s ]" % (str(ind), pegarValorIndividuo(ind, itens), pegarPesoIndividuo(ind, itens)))
 
 if __name__ == "__main__":
   main()
