@@ -1,12 +1,25 @@
 # -*- coding: utf-8 -*-
 import csv
 import random
+import matplotlib.pyplot
 from item import Item
 
 GEN_MAXIMO = 200000
 POPULACAO_INICIAL_QUANT = 10
 CAPACIDADE_MOCHILA = 22
-MEDIA_QUALIDADE_NUMBER = 10
+MEDIA_QUALIDADE_NUMBER = 5
+
+def gerarGrafico(mediaGeracoes):
+	geracoes = []
+	valores = []
+	for i in range(len(mediaGeracoes)):
+		valores.append(mediaGeracoes[i])
+		geracoes.append(i+1)
+	matplotlib.pyplot.title('Media do fitness das geracoes durante o algoritmo genetico')
+	matplotlib.pyplot.xlabel('Geracoes')
+	matplotlib.pyplot.ylabel('Fitness')
+	matplotlib.pyplot.plot(geracoes, valores)
+	matplotlib.pyplot.show()
 
 def gerarItens():
 	arquivo = open('itens.csv')
@@ -144,6 +157,7 @@ def main():
 	for g in range(0, GEN_MAXIMO):
 		if verificarPadronizacao(mediaGeracoes):
 			retornarMelhorDaPopulacao(populacao,itens)
+			gerarGrafico(mediaGeracoes)
 			break
 		geracao += 1
 		print(" --- Geracao %s ---" % str(geracao))
