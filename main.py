@@ -1,10 +1,12 @@
+# -*- coding: utf-8 -*-
 import csv
 import random
 from item import Item
 
-GEN_MAXIMO = 20000
+GEN_MAXIMO = 200000
 POPULACAO_INICIAL_QUANT = 10
 CAPACIDADE_MOCHILA = 22
+MEDIA_QUALIDADE_NUMBER = 10
 
 def gerarItens():
 	arquivo = open('itens.csv')
@@ -27,15 +29,15 @@ def fitness(individuo, itens):
 		if index >= len(itens):
 			break
 		if (i == 1):
-			totalValor += itens[index].valor
-			totalPeso += itens[index].peso
+			totalValor += itens[index].valor # Somar todos os valores dentro do individuo
+			totalPeso += itens[index].peso # Somar todos os pesos dentro do individuo
 		index += 1
-	if totalPeso > CAPACIDADE_MOCHILA:
-		return totalValor - (totalPeso - CAPACIDADE_MOCHILA)
+	if totalPeso > CAPACIDADE_MOCHILA: # Verificar se peso excede a capacidade da mochila
+		return 0
 	else:
-		return totalValor # ESTA OKAY
+		return totalValor # Retornar soma dos valores quando peso não exceder
 	
-def pegarValorIndividuo(individuo, itens):
+def pegarValorIndividuo(individuo, itens): # Função para retornar valor de um individuo
 	index = 0
 	totalValor = 0
 	for i in individuo:
@@ -46,7 +48,7 @@ def pegarValorIndividuo(individuo, itens):
 		index += 1
 	return totalValor
 
-def pegarPesoIndividuo(individuo, itens):
+def pegarPesoIndividuo(individuo, itens): # Função para retornar peso de um individuo
 	index = 0
 	totalPeso = 0
 	for i in individuo:
@@ -58,40 +60,40 @@ def pegarPesoIndividuo(individuo, itens):
 	return totalPeso
 
 def roulleteWheel(populacao, itens):
-	max = sum(fitness(ind, itens) for ind in populacao)
-	pick = random.uniform(0, max)
+	max = sum(fitness(ind, itens) for ind in populacao) # Realizar a soma dos fitness de uma populacao
+	pick = random.uniform(0, max) # randomizar um numero em cima da soma
 	current = 0
 	for ind in populacao:
 			current += fitness(ind, itens)
-			if current > pick:
-					return ind
-
-def returnMatches(a,b):
-       return list(set(a) & set(b))
+			if current > pick: # Se valor alcançado for maior que o escolhido de forma relatória
+					return ind # Retornar individuo
 
 def selecao(populacao, itens):
-	mutation_chance = 0.08
+	# mutation_chance = 0.08
 	filhos = []
 	for x in range(0,POPULACAO_INICIAL_QUANT/2):
-		individuo1 = roulleteWheel(populacao, itens)
-		individuo2 = roulleteWheel(populacao, itens)
-		while individuo1 == individuo2:
+		individuo1 = roulleteWheel(populacao, itens) # Utilizar algoritmo do RoulleteWheel para selecionar individuo
+		individuo2 = roulleteWheel(populacao, itens) # Utilizar algoritmo do RoulleteWheel para selecionar o segundo individuo
+		while individuo1 == individuo2: # Enquanto individuo 1 for igual ao individuo 2 continuar realizando algoritmo do RoulleteWheel
 			individuo2 = roulleteWheel(populacao, itens)
-		meio = len(individuo1)/2
-		filho = individuo1[:meio] + individuo2[meio:]
-		if mutation_chance > random.random():
-			filho = mutacao(filho)
+		# meio = len(individuo1)/2
+		corte = random.randint(0,len(individuo1)-1) # Randomizar onde será realizado o corte para geração de filhos
+		filho = individuo1[:corte] + individuo2[corte:] # Criação do primeiro filho
+		# if mutation_chance > random.random():
+		# 	filho = mutacao(filho)
 		filhos.append(filho)
-		filho2 = individuo2[:meio] + individuo1[meio:]
-		if mutation_chance > random.random():
-			filho2 = mutacao(filho2)
+		filho2 = individuo2[:corte] + individuo1[corte:] # Criação do segundo filho
+		# if mutation_chance > random.random():
+		# 	filho2 = mutacao(filho2)
 		filhos.append(filho2)
-	eleito = eletismo(populacao, itens)
-	filhos.append(eleito)
-	return filhos
+	filhoParaMutacao = random.randint(0,POPULACAO_INICIAL_QUANT-1); # Selecionar indice do filho para mutacao de forma aleatoria
+	filhos[filhoParaMutacao] = mutacao(filhos[filhoParaMutacao]) # Realizar mutacao
+	eleito = eletismo(populacao, itens) # Selecionar o melhor individuo da geração passada
+	filhos.append(eleito) # Adicionar individuo selecionado para nova geração
+	return filhos # Retornar nova geração
 
 def mutacao(individuo):
-	r = random.randint(0,len(individuo)-1)
+	r = random.randint(0,len(individuo)-1) # Randomizar a posição em que vai haver a alteração no individuo
 	if individuo[r] == 1:
 			individuo[r] = 0
 	else:
@@ -103,12 +105,12 @@ def eletismo(populacao, itens):
 	eleito = None
 	valorEleito = 0
 	for ind in populacao:
-		if fitness(ind, itens) > valorEleito:
+		if fitness(ind, itens) > valorEleito: # Verificar sempre o individuo com melhor fitness para poder retornar
 			eleito = ind
 			valorEleito = fitness(ind, itens)
 	return eleito
 
-def calcularMedPop(populacao, itens):
+def calcularMedPop(populacao, itens): # Calcular média de FITNESS em uma geração
 	total = 0
 	quantidade = 0
 	for ind in populacao:
@@ -116,23 +118,33 @@ def calcularMedPop(populacao, itens):
 		quantidade += 1
 	return total/quantidade
 
-def verificarPadronizacao(mediaGeracoes):
+def verificarPadronizacao(mediaGeracoes): # Verificar padronização da média para poder para o algoritmo
 	# for med in expression_list:
 		# pass
-	if (len(mediaGeracoes) >= 5):
-		mediaGeracoes = mediaGeracoes[:5]
+	if (len(mediaGeracoes) >= MEDIA_QUALIDADE_NUMBER):
+		mediaGeracoes = mediaGeracoes[-MEDIA_QUALIDADE_NUMBER:]
 		if mediaGeracoes[1:] == mediaGeracoes[:-1]:
 			return True
 	return False
 
+def retornarMelhorDaPopulacao(populacao, itens):
+	melhor = eletismo(populacao, itens)
+	print("\n ---- O MELHOR RESULTADO ENCONTRADO -----")
+	print("\n ESTRUTURA = %s" % (str(melhor)))
+	print("\n VALOR = %s" % (pegarValorIndividuo(melhor,itens)))
+	print("\n PESO = %s" % (pegarPesoIndividuo(melhor,itens)))
+	print("\n FITNESS = %s" % (fitness(melhor,itens)))
+
 
 def main():
 	geracao = 0
-	itens = gerarItens() # gerar itens de acordo com o CSV
-	populacao = gerarPopulacaoInicial(itens) # gerar a populacao inicial
+	itens = gerarItens() # Gerar itens de acordo com o CSV
+	populacao = gerarPopulacaoInicial(itens) # Gerar a populacao inicial
 	mediaGeracoes = []
 	for g in range(0, GEN_MAXIMO):
-		if verificarPadronizacao(mediaGeracoes): break
+		if verificarPadronizacao(mediaGeracoes):
+			retornarMelhorDaPopulacao(populacao,itens)
+			break
 		geracao += 1
 		print(" --- Geracao %s ---" % str(geracao))
 		populacao = selecao(populacao, itens)
@@ -143,7 +155,7 @@ def main():
 				pegarPesoIndividuo(ind, itens),
 				fitness(ind, itens))
 			)
-		mediaGeracoes.append(calcularMedPop(populacao, itens))
+		mediaGeracoes.append(calcularMedPop(populacao, itens)) # Adicionar media da população na lista
 		print("MEDIA POPULACAO: [ %s ]" % (calcularMedPop(populacao, itens)))
 
 if __name__ == "__main__":
