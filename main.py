@@ -89,15 +89,10 @@ def selecao(populacao, itens):
 		individuo2 = roulleteWheel(populacao, itens) # Utilizar algoritmo do RoulleteWheel para selecionar o segundo individuo
 		while individuo1 == individuo2: # Enquanto individuo 1 for igual ao individuo 2 continuar realizando algoritmo do RoulleteWheel
 			individuo2 = roulleteWheel(populacao, itens)
-		# meio = len(individuo1)/2
 		corte = random.randint(0,len(individuo1)-1) # Randomizar onde será realizado o corte para geração de filhos
 		filho = individuo1[:corte] + individuo2[corte:] # Criação do primeiro filho
-		# if mutation_chance > random.random():
-		# 	filho = mutacao(filho)
 		filhos.append(filho)
 		filho2 = individuo2[:corte] + individuo1[corte:] # Criação do segundo filho
-		# if mutation_chance > random.random():
-		# 	filho2 = mutacao(filho2)
 		filhos.append(filho2)
 	filhoParaMutacao = random.randint(0,POPULACAO_INICIAL_QUANT-1); # Selecionar indice do filho para mutacao de forma aleatoria
 	filhos[filhoParaMutacao] = mutacao(filhos[filhoParaMutacao]) # Realizar mutacao
