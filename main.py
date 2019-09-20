@@ -176,8 +176,8 @@ def main():
 		# 		pegarPesoIndividuo(ind, itens),
 		# 		fitness(ind, itens))
 		# 	)
-		mediaGeracoes.append(calcularMedPop(populacao, itens)) # Adicionar media da população na lista
-		print("MEDIA POPULACAO: [ %s ]" % (calcularMedPop(populacao, itens)))
+		mediaGeracoes.append(int(calcularMedPop(populacao, itens))) # Adicionar media da população na lista
+		print("MEDIA POPULACAO: [ %s ]" % (int(calcularMedPop(populacao, itens))))
 
 if __name__ == "__main__":
   main()
