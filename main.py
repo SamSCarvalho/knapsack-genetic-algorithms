@@ -96,7 +96,7 @@ def gerarCortes(individuo):
 def selecao(populacao, itens):
 	# mutation_chance = 0.08
 	filhos = []
-	for x in range(0,POPULACAO_INICIAL_QUANT/2):
+	for x in range(0,int(POPULACAO_INICIAL_QUANT/2)):
 		individuo1 = roulleteWheel(populacao, itens) # Utilizar algoritmo do RoulleteWheel para selecionar individuo
 		individuo2 = roulleteWheel(populacao, itens) # Utilizar algoritmo do RoulleteWheel para selecionar o segundo individuo
 		while individuo1 == individuo2: # Enquanto individuo 1 for igual ao individuo 2 continuar realizando algoritmo do RoulleteWheel
