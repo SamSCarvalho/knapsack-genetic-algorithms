@@ -5,7 +5,7 @@ import matplotlib.pyplot
 from item import Item
 
 GEN_MAXIMO = 200000
-POPULACAO_INICIAL_QUANT = 10
+POPULACAO_INICIAL_QUANT = 100
 CAPACIDADE_MOCHILA = 22
 MEDIA_QUALIDADE_NUMBER = 5
 
@@ -81,6 +81,18 @@ def roulleteWheel(populacao, itens):
 			if current > pick: # Se valor alcançado for maior que o escolhido de forma relatória
 					return ind # Retornar individuo
 
+def gerarCortes(individuo):
+	cortes = []
+	corte1 = random.randint(0,len(individuo)-1) # Randomizar onde será realizado o corte para geração de filhos
+	while (corte1 == len(individuo)-1):
+		corte1 = random.randint(0,len(individuo)-1)
+	corte2 = random.randint(0,len(individuo)-1)
+	while(corte2 <= corte1):
+		corte2 = random.randint(0,len(individuo)-1)
+	cortes.append(corte1)
+	cortes.append(corte2)
+	return cortes
+
 def selecao(populacao, itens):
 	# mutation_chance = 0.08
 	filhos = []
@@ -89,10 +101,10 @@ def selecao(populacao, itens):
 		individuo2 = roulleteWheel(populacao, itens) # Utilizar algoritmo do RoulleteWheel para selecionar o segundo individuo
 		while individuo1 == individuo2: # Enquanto individuo 1 for igual ao individuo 2 continuar realizando algoritmo do RoulleteWheel
 			individuo2 = roulleteWheel(populacao, itens)
-		corte = random.randint(0,len(individuo1)-1) # Randomizar onde será realizado o corte para geração de filhos
-		filho = individuo1[:corte] + individuo2[corte:] # Criação do primeiro filho
+		cortes = gerarCortes(individuo1) # Gerar os dois cortes para o cruzamento em dois pontos
+		filho = individuo1[:cortes[0]] + individuo2[cortes[0]:cortes[1]] + individuo1[cortes[1]:] # Criação do primeiro filho
 		filhos.append(filho)
-		filho2 = individuo2[:corte] + individuo1[corte:] # Criação do segundo filho
+		filho2 = individuo2[:cortes[0]] + individuo1[cortes[0]:cortes[1]] + individuo2[cortes[1]:] # Criação do segundo filho
 		filhos.append(filho2)
 	filhoParaMutacao = random.randint(0,POPULACAO_INICIAL_QUANT-1); # Selecionar indice do filho para mutacao de forma aleatoria
 	filhos[filhoParaMutacao] = mutacao(filhos[filhoParaMutacao]) # Realizar mutacao
@@ -148,7 +160,7 @@ def main():
 	geracao = 0
 	itens = gerarItens() # Gerar itens de acordo com o CSV
 	populacao = gerarPopulacaoInicial(itens) # Gerar a populacao inicial
-	mediaGeracoes = []
+	mediaGeracoes = [] # Lista para armazenar a media de fitness das gerações
 	for g in range(0, GEN_MAXIMO):
 		if verificarPadronizacao(mediaGeracoes):
 			retornarMelhorDaPopulacao(populacao,itens)
@@ -157,13 +169,13 @@ def main():
 		geracao += 1
 		print(" --- Geracao %s ---" % str(geracao))
 		populacao = selecao(populacao, itens)
-		for ind in populacao:
-			print("%s, VALOR: [ %s ] PESO: [ %s ] FITNESS: [ %s ]" % (
-				str(ind),
-				pegarValorIndividuo(ind, itens),
-				pegarPesoIndividuo(ind, itens),
-				fitness(ind, itens))
-			)
+		# for ind in populacao:
+		# 	print("%s, VALOR: [ %s ] PESO: [ %s ] FITNESS: [ %s ]" % (
+		# 		str(ind),
+		# 		pegarValorIndividuo(ind, itens),
+		# 		pegarPesoIndividuo(ind, itens),
+		# 		fitness(ind, itens))
+		# 	)
 		mediaGeracoes.append(calcularMedPop(populacao, itens)) # Adicionar media da população na lista
 		print("MEDIA POPULACAO: [ %s ]" % (calcularMedPop(populacao, itens)))
 
