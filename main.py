@@ -77,9 +77,9 @@ def roulleteWheel(populacao, itens):
 	pick = random.uniform(0, max) # randomizar um numero em cima da soma
 	current = 0
 	for ind in populacao:
-			current += fitness(ind, itens)
-			if current > pick: # Se valor alcançado for maior que o escolhido de forma relatória
-					return ind # Retornar individuo
+		current += fitness(ind, itens)
+		if current > pick: # Se valor alcançado for maior que o escolhido de forma relatória
+				return ind # Retornar individuo
 
 def gerarCortes(individuo):
 	cortes = []
@@ -155,13 +155,13 @@ def retornarMelhorDaPopulacao(populacao, itens):
 	print("\n PESO = %s" % (pegarPesoIndividuo(melhor,itens)))
 	print("\n FITNESS = %s" % (fitness(melhor,itens)))
 
-
 def main():
 	geracao = 0
 	itens = gerarItens() # Gerar itens de acordo com o CSV
 	populacao = gerarPopulacaoInicial(itens) # Gerar a populacao inicial
 	mediaGeracoes = [] # Lista para armazenar a media de fitness das gerações
 	for g in range(0, GEN_MAXIMO):
+		populacao = sorted(populacao, key=lambda x: fitness(x, itens), reverse=True) # Ordenar de forma reversa pelo fitness dos individuos
 		if verificarPadronizacao(mediaGeracoes):
 			retornarMelhorDaPopulacao(populacao,itens)
 			gerarGrafico(mediaGeracoes)
